@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		298F47222E169FB400DA4644 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 298F47212E169FB400DA4644 /* Logging */; };
+		298F47252E16A0CA00DA4644 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 298F47242E16A0CA00DA4644 /* ComposableArchitecture */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		298F47022E16996400DA4644 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -29,9 +34,22 @@
 		298F470B2E16996400DA4644 /* ContinuousGPSLoggerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ContinuousGPSLoggerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		298F471F2E169C2200DA4644 /* Exceptions for "ContinuousGPSLogger" folder in "ContinuousGPSLogger" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 298F46F32E16996100DA4644 /* ContinuousGPSLogger */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		298F46F62E16996100DA4644 /* ContinuousGPSLogger */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				298F471F2E169C2200DA4644 /* Exceptions for "ContinuousGPSLogger" folder in "ContinuousGPSLogger" target */,
+			);
 			path = ContinuousGPSLogger;
 			sourceTree = "<group>";
 		};
@@ -52,6 +70,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				298F47252E16A0CA00DA4644 /* ComposableArchitecture in Frameworks */,
+				298F47222E169FB400DA4644 /* Logging in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +132,8 @@
 			);
 			name = ContinuousGPSLogger;
 			packageProductDependencies = (
+				298F47212E169FB400DA4644 /* Logging */,
+				298F47242E16A0CA00DA4644 /* ComposableArchitecture */,
 			);
 			productName = ContinuousGPSLogger;
 			productReference = 298F46F42E16996100DA4644 /* ContinuousGPSLogger.app */;
@@ -195,6 +217,10 @@
 			);
 			mainGroup = 298F46EB2E16996100DA4644;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				298F47202E169FB400DA4644 /* XCRemoteSwiftPackageReference "swift-log" */,
+				298F47232E16A0CA00DA4644 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 298F46F52E16996100DA4644 /* Products */;
 			projectDirPath = "";
@@ -395,8 +421,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = UAWH6MPAYZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ContinuousGPSLogger/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -422,8 +450,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = UAWH6MPAYZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ContinuousGPSLogger/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -550,6 +580,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		298F47202E169FB400DA4644 /* XCRemoteSwiftPackageReference "swift-log" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-log.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.6.3;
+			};
+		};
+		298F47232E16A0CA00DA4644 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		298F47212E169FB400DA4644 /* Logging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 298F47202E169FB400DA4644 /* XCRemoteSwiftPackageReference "swift-log" */;
+			productName = Logging;
+		};
+		298F47242E16A0CA00DA4644 /* ComposableArchitecture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 298F47232E16A0CA00DA4644 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			productName = ComposableArchitecture;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 298F46EC2E16996100DA4644 /* Project object */;
 }
