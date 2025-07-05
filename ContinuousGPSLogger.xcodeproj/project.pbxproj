@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2939F2782E181573009420BE /* GPSLogger.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2939F2762E181573009420BE /* GPSLogger.xcdatamodeld */; };
 		298F47222E169FB400DA4644 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 298F47212E169FB400DA4644 /* Logging */; };
 		298F47252E16A0CA00DA4644 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 298F47242E16A0CA00DA4644 /* ComposableArchitecture */; };
 /* End PBXBuildFile section */
@@ -29,6 +30,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2939F2772E181573009420BE /* GPSLogger.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = GPSLogger.xcdatamodel; sourceTree = "<group>"; };
 		298F46F42E16996100DA4644 /* ContinuousGPSLogger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ContinuousGPSLogger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		298F47012E16996400DA4644 /* ContinuousGPSLoggerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ContinuousGPSLoggerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		298F470B2E16996400DA4644 /* ContinuousGPSLoggerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ContinuousGPSLoggerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -95,6 +97,7 @@
 		298F46EB2E16996100DA4644 = {
 			isa = PBXGroup;
 			children = (
+				2939F2762E181573009420BE /* GPSLogger.xcdatamodeld */,
 				298F46F62E16996100DA4644 /* ContinuousGPSLogger */,
 				298F47042E16996400DA4644 /* ContinuousGPSLoggerTests */,
 				298F470E2E16996400DA4644 /* ContinuousGPSLoggerUITests */,
@@ -262,6 +265,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2939F2782E181573009420BE /* GPSLogger.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -612,6 +616,19 @@
 			productName = ComposableArchitecture;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		2939F2762E181573009420BE /* GPSLogger.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				2939F2772E181573009420BE /* GPSLogger.xcdatamodel */,
+			);
+			currentVersion = 2939F2772E181573009420BE /* GPSLogger.xcdatamodel */;
+			path = GPSLogger.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 298F46EC2E16996100DA4644 /* Project object */;
 }

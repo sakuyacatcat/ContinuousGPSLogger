@@ -11,7 +11,7 @@ import SwiftUI
 struct ContinuousGPSLoggerApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HistoryView()
         }
     }
 }
