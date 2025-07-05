@@ -7,18 +7,6 @@
 
 import SwiftUI
 
-//struct ContentView: View {
-//    var body: some View {
-//        VStack {
-//            Image(systemName: "globe")
-//                .imageScale(.large)
-//                .foregroundStyle(.tint)
-//            Text("Hello, world!")
-//        }
-//        .padding()
-//    }
-//}
-
 struct HistoryView: View {
     // CoreData の @FetchRequest を活用
     @FetchRequest(
@@ -33,11 +21,13 @@ struct HistoryView: View {
                 Text(p.timestamp ?? Date(), style: .time)
                 Text("\(p.lat), \(p.lon)")
                     .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
+        .navigationTitle("履歴")
     }
 }
 
 #Preview {
-    HistoryView()
+    HistoryView().environment(\.managedObjectContext, PersistenceService.shared.container.viewContext)
 }
