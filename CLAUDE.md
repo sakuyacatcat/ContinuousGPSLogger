@@ -36,6 +36,7 @@ ContinuousGPSLogger/
 ## Development Commands
 
 ### Building and Running
+
 ```bash
 # Build the project
 xcodebuild -scheme ContinuousGPSLogger -configuration Debug build
@@ -48,6 +49,7 @@ xcodebuild -scheme ContinuousGPSLogger clean
 ```
 
 ### Xcode Development
+
 - Open `ContinuousGPSLogger.xcodeproj` in Xcode
 - Main scheme: `ContinuousGPSLogger`
 - Available targets: `ContinuousGPSLogger`, `ContinuousGPSLoggerTests`, `ContinuousGPSLoggerUITests`
@@ -56,11 +58,13 @@ xcodebuild -scheme ContinuousGPSLogger clean
 ## Key Implementation Details
 
 ### Background Location Permissions
+
 - App requires "Always" location permission for continuous tracking
 - Background modes enabled: `location`, `fetch`, `processing`
 - Location usage descriptions in Japanese in Info.plist
 
 ### Location Service Requirements
+
 - Use `CLLocationManager` with `desiredAccuracy = kCLLocationAccuracyBest`
 - Enable `allowsBackgroundLocationUpdates = true`
 - Implement `startMonitoringSignificantLocationChanges()` for app resurrection
@@ -68,12 +72,14 @@ xcodebuild -scheme ContinuousGPSLogger clean
 - For older iOS: Use delegate-based `startUpdatingLocation()`
 
 ### Data Persistence
+
 - Core Data model with `TrackPoint` entity
 - Attributes: `timestamp`, `lat`, `lon`, `hAcc`, `speed`, `id`
 - Background task scheduling for periodic data flush
 - Consider SwiftData migration for iOS 18+ features
 
 ### Background Task Management
+
 - Register `BGProcessingTaskRequest` with identifier "flush"
 - Schedule 15-minute intervals for data persistence
 - Handle app termination and significant location changes
@@ -81,6 +87,7 @@ xcodebuild -scheme ContinuousGPSLogger clean
 ## Design Document Reference
 
 Comprehensive implementation roadmap available in `docs/designDocument.md` with 46 detailed steps covering:
+
 - Project setup and capabilities configuration
 - Core Location and background modes implementation
 - Data persistence with Core Data
@@ -101,3 +108,10 @@ Comprehensive implementation roadmap available in `docs/designDocument.md` with 
 - Include screenshots demonstrating location tracking purpose
 - Battery optimization and background location best practices
 - TestFlight testing for real-world background behavior validation
+
+## Principles to Follow
+
+- John Carmack, Robert C. Martin, Rob Pike ならどう設計するかを意識せよ。
+- 小さく、シンプルに保つこと。
+- 変更に強い設計を心がける。
+- t-wada の TDD（Test-Driven Development）を実践する。
