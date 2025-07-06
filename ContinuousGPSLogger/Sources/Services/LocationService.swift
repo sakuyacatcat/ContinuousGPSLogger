@@ -13,6 +13,9 @@ final class LocationService: NSObject, ObservableObject {
     static let shared = LocationService()
 
     @Published private(set) var current: CLLocation?
+    @Published private(set) var authorizationStatus: CLAuthorizationStatus = .notDetermined
+    @Published private(set) var isTracking: Bool = false
+    @Published private(set) var lastError: String?
 
     private let manager = CLLocationManager()
 
@@ -20,8 +23,13 @@ final class LocationService: NSObject, ObservableObject {
         super.init()
         manager.delegate = self
         manager.desiredAccuracy = kCLLocationAccuracyBest
-        manager.requestWhenInUseAuthorization()
-        manager.startUpdatingLocation()
+        authorizationStatus = manager.authorizationStatus
+        
+        if authorizationStatus == .notDetermined {
+            manager.requestWhenInUseAuthorization()
+        } else if authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways {
+            startTracking()
+        }
     }
 }
 
@@ -33,6 +41,50 @@ extension LocationService: CLLocationManagerDelegate {
         // MainActor に Hop して Published プロパティを更新
         Task { @MainActor in
             self.current = loc
+            self.lastError = nil
         }
+    }
+    
+    nonisolated func locationManager(_ manager: CLLocationManager,
+                                     didChangeAuthorization status: CLAuthorizationStatus) {
+        Task { @MainActor in
+            self.authorizationStatus = status
+            
+            switch status {
+            case .authorizedWhenInUse, .authorizedAlways:
+                self.startTracking()
+                self.lastError = nil
+            case .denied, .restricted:
+                self.stopTracking()
+                self.lastError = "位置情報の利用が許可されていません"
+            case .notDetermined:
+                self.stopTracking()
+                self.lastError = nil
+            @unknown default:
+                self.stopTracking()
+                self.lastError = "不明な認証状態です"
+            }
+        }
+    }
+    
+    nonisolated func locationManager(_ manager: CLLocationManager,
+                                     didFailWithError error: Error) {
+        Task { @MainActor in
+            self.lastError = error.localizedDescription
+        }
+    }
+    
+    private func startTracking() {
+        guard authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways else {
+            return
+        }
+        
+        manager.startUpdatingLocation()
+        isTracking = true
+    }
+    
+    private func stopTracking() {
+        manager.stopUpdatingLocation()
+        isTracking = false
     }
 }
