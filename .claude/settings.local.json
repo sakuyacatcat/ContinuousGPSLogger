@@ -3,7 +3,10 @@
     "MAX_THINKING_TOKENS": "31999"
   },
   "permissions": {
-    "allow": ["Bash(xcodebuild:*)"],
+    "allow": [
+      "Bash(xcodebuild:*)",
+      "Bash(find:*)"
+    ],
     "deny": []
   }
 }
