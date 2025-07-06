@@ -29,6 +29,16 @@ struct ContinuousGPSLoggerApp: App {
                 }
             }
             .environment(\.managedObjectContext, ctx)   // ← ここが重要
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
+                Task { @MainActor in
+                    LocationService.shared.handleAppDidEnterBackground()
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                Task { @MainActor in
+                    LocationService.shared.handleAppWillEnterForeground()
+                }
+            }
         }
     }
 }

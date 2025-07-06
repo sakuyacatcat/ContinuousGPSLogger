@@ -21,6 +21,11 @@ final class LocationService: NSObject, ObservableObject {
     @Published private(set) var saveCount: Int = 0
     @Published private(set) var lastSaveTimestamp: Date?
     @Published private(set) var saveError: String?
+    
+    // バックグラウンド関連の状態
+    @Published private(set) var isBackgroundLocationEnabled: Bool = false
+    @Published private(set) var isSignificantLocationChangesEnabled: Bool = false
+    @Published private(set) var lastBackgroundUpdate: Date?
 
     private let manager = CLLocationManager()
 
@@ -34,6 +39,11 @@ final class LocationService: NSObject, ObservableObject {
             manager.requestAlwaysAuthorization()
         } else if authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways {
             startTracking()
+            // Always権限が取得済みの場合はバックグラウンド対応を有効化
+            if authorizationStatus == .authorizedAlways {
+                enableBackgroundLocationUpdates()
+                startMonitoringSignificantLocationChanges()
+            }
         }
     }
 }
@@ -75,6 +85,8 @@ extension LocationService: CLLocationManagerDelegate {
                 self.lastError = nil
             case .authorizedAlways:
                 self.startTracking()
+                self.enableBackgroundLocationUpdates()
+                self.startMonitoringSignificantLocationChanges()
                 self.lastError = nil
             case .denied, .restricted:
                 self.stopTracking()
@@ -138,5 +150,43 @@ extension LocationService: CLLocationManagerDelegate {
         if saveCount % 100 == 0 {
             PersistenceService.shared.purge(olderThan: 7)
         }
+    }
+    
+    // MARK: - バックグラウンド対応
+    
+    /// バックグラウンド位置更新の設定
+    private func enableBackgroundLocationUpdates() {
+        guard authorizationStatus == .authorizedAlways else { return }
+        
+        manager.allowsBackgroundLocationUpdates = true
+        manager.pausesLocationUpdatesAutomatically = false
+        isBackgroundLocationEnabled = true
+    }
+    
+    /// 重要な位置変更の監視開始
+    func startMonitoringSignificantLocationChanges() {
+        guard authorizationStatus == .authorizedAlways else { return }
+        
+        manager.startMonitoringSignificantLocationChanges()
+        isSignificantLocationChangesEnabled = true
+    }
+    
+    /// 重要な位置変更の監視停止
+    func stopMonitoringSignificantLocationChanges() {
+        manager.stopMonitoringSignificantLocationChanges()
+        isSignificantLocationChangesEnabled = false
+    }
+    
+    /// アプリライフサイクルイベントの処理
+    func handleAppDidEnterBackground() {
+        // バックグラウンド移行時の処理
+        enableBackgroundLocationUpdates()
+        startMonitoringSignificantLocationChanges()
+    }
+    
+    func handleAppWillEnterForeground() {
+        // フォアグラウンド復帰時の処理
+        // 状態同期とデータ更新
+        lastBackgroundUpdate = Date()
     }
 }

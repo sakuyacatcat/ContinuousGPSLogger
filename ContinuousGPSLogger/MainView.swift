@@ -130,6 +130,37 @@ struct MainView: View {
                 }
             }
             
+            Section("バックグラウンド状態") {
+                HStack {
+                    Text("バックグラウンド位置更新")
+                    Spacer()
+                    Text(loc.isBackgroundLocationEnabled ? "有効" : "無効")
+                        .foregroundColor(loc.isBackgroundLocationEnabled ? .green : .gray)
+                }
+                
+                HStack {
+                    Text("重要な位置変更の監視")
+                    Spacer()
+                    Text(loc.isSignificantLocationChangesEnabled ? "監視中" : "停止中")
+                        .foregroundColor(loc.isSignificantLocationChangesEnabled ? .green : .gray)
+                }
+                
+                if let lastUpdate = loc.lastBackgroundUpdate {
+                    HStack {
+                        Text("最後のバックグラウンド更新")
+                        Spacer()
+                        Text(lastUpdate, format: .dateTime.hour().minute().second())
+                            .foregroundColor(.secondary)
+                    }
+                }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(backgroundStatusText)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            
             if let error = loc.lastError {
                 Section("エラー") {
                     Label(error, systemImage: "exclamationmark.triangle")
@@ -184,6 +215,18 @@ struct MainView: View {
             return .orange
         @unknown default:
             return .gray
+        }
+    }
+    
+    private var backgroundStatusText: String {
+        if loc.authorizationStatus == .authorizedAlways {
+            if loc.isBackgroundLocationEnabled && loc.isSignificantLocationChangesEnabled {
+                return "バックグラウンドでの位置追跡が有効です。アプリ終了後も継続的に位置情報を記録します。"
+            } else {
+                return "Always権限が許可されていますが、バックグラウンド機能の設定が不完全です。"
+            }
+        } else {
+            return "バックグラウンドでの位置追跡にはAlways権限が必要です。"
         }
     }
 }
