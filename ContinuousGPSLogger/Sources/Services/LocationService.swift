@@ -54,6 +54,9 @@ extension LocationService: CLLocationManagerDelegate {
                 self.saveCount += 1
                 self.lastSaveTimestamp = Date()
                 self.saveError = nil
+                
+                // 定期的なデータ管理
+                self.manageDataAfterSave()
             } else {
                 self.saveError = "データの保存に失敗しました"
             }
@@ -120,5 +123,20 @@ extension LocationService: CLLocationManagerDelegate {
     
     var needsAlwaysPermission: Bool {
         return authorizationStatus == .authorizedWhenInUse
+    }
+    
+    /// 保存後のデータ管理
+    private func manageDataAfterSave() {
+        let totalCount = PersistenceService.shared.getTotalCount()
+        
+        // 1000件を超えたら古いデータを削除
+        if totalCount > 1000 {
+            PersistenceService.shared.purge(olderThan: 30)
+        }
+        
+        // 一定間隔で自動削除（例：100件保存ごと）
+        if saveCount % 100 == 0 {
+            PersistenceService.shared.purge(olderThan: 7)
+        }
     }
 }

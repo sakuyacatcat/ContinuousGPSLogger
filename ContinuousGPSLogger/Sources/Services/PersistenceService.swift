@@ -65,4 +65,63 @@ import CoreLocation
          do    { try container.persistentStoreCoordinator.execute(delete, with: container.viewContext) }
          catch { print("purge error", error) }
      }
+     
+     /// 全データ削除
+     func deleteAll() {
+         let context = container.viewContext
+         let request = TrackPoint.fetchRequest()
+         
+         do {
+             let points = try context.fetch(request)
+             for point in points {
+                 context.delete(point)
+             }
+             try context.save()
+         } catch {
+             print("全データ削除エラー:", error)
+         }
+     }
+     
+     /// 総データ数取得
+     func getTotalCount() -> Int {
+         let context = container.viewContext
+         let request = TrackPoint.fetchRequest()
+         
+         do {
+             return try context.count(for: request)
+         } catch {
+             print("データ数取得エラー:", error)
+             return 0
+         }
+     }
+     
+     /// 最古データ取得
+     func getOldestRecord() -> TrackPoint? {
+         let context = container.viewContext
+         let request = TrackPoint.fetchRequest()
+         request.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
+         request.fetchLimit = 1
+         
+         do {
+             return try context.fetch(request).first
+         } catch {
+             print("最古データ取得エラー:", error)
+             return nil
+         }
+     }
+     
+     /// 最新データ取得
+     func getNewestRecord() -> TrackPoint? {
+         let context = container.viewContext
+         let request = TrackPoint.fetchRequest()
+         request.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
+         request.fetchLimit = 1
+         
+         do {
+             return try context.fetch(request).first
+         } catch {
+             print("最新データ取得エラー:", error)
+             return nil
+         }
+     }
  }
