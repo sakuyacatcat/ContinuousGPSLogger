@@ -23,8 +23,8 @@ import CoreLocation
 
      // MARK: - CRUD
 
-     /// 1 点保存
-     func save(trackPoint: CLLocation) {
+     /// 1 点保存（成功/失敗を返す）
+     func save(trackPoint: CLLocation) -> Bool {
          let ctx = container.viewContext
          let tp = TrackPoint(context: ctx)
          tp.id        = .init()
@@ -34,8 +34,13 @@ import CoreLocation
          tp.hAcc      = trackPoint.horizontalAccuracy
          tp.speed     = trackPoint.speed
 
-         do    { try ctx.save() }
-         catch { print("CoreData save error", error) }
+         do {
+             try ctx.save()
+             return true
+         } catch {
+             print("CoreData save error", error)
+             return false
+         }
      }
 
      /// 直近 limit 件を降順で取得

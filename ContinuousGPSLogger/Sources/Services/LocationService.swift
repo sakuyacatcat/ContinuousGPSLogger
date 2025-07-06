@@ -18,6 +18,9 @@ final class LocationService: NSObject, ObservableObject {
     @Published private(set) var isTracking: Bool = false
     @Published private(set) var lastError: String?
     @Published private(set) var permissionRequestInProgress: Bool = false
+    @Published private(set) var saveCount: Int = 0
+    @Published private(set) var lastSaveTimestamp: Date?
+    @Published private(set) var saveError: String?
 
     private let manager = CLLocationManager()
 
@@ -44,6 +47,16 @@ extension LocationService: CLLocationManagerDelegate {
         Task { @MainActor in
             self.current = loc
             self.lastError = nil
+            
+            // 自動保存処理
+            let success = PersistenceService.shared.save(trackPoint: loc)
+            if success {
+                self.saveCount += 1
+                self.lastSaveTimestamp = Date()
+                self.saveError = nil
+            } else {
+                self.saveError = "データの保存に失敗しました"
+            }
         }
     }
     
