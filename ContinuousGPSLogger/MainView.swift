@@ -27,6 +27,34 @@ struct MainView: View {
                     Text(loc.isTracking ? "取得中" : "停止中")
                         .foregroundColor(loc.isTracking ? .green : .gray)
                 }
+                
+                if loc.permissionRequestInProgress {
+                    HStack {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                        Text("権限を要求中…")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(permissionGuidanceText)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    
+                    if loc.needsAlwaysPermission {
+                        Button("Always 権限をリクエスト") {
+                            loc.requestAlwaysPermission()
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(loc.permissionRequestInProgress)
+                    } else if loc.authorizationStatus == .denied {
+                        Button("設定を開く") {
+                            loc.openSettings()
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                }
             }
             
             Section("現在地") {
@@ -83,6 +111,23 @@ struct MainView: View {
             }
         }
         .navigationTitle("現在地")
+    }
+    
+    private var permissionGuidanceText: String {
+        switch loc.authorizationStatus {
+        case .notDetermined:
+            return "位置情報の利用許可をお願いします。バックグラウンドでの GPS 追跡には Always 権限が必要です。"
+        case .denied:
+            return "位置情報の利用が拒否されています。設定から位置情報の利用を許可してください。"
+        case .restricted:
+            return "位置情報の利用が制限されています。"
+        case .authorizedWhenInUse:
+            return "現在は使用中のみ許可されています。バックグラウンドでの GPS 追跡には Always 権限が必要です。"
+        case .authorizedAlways:
+            return "位置情報の利用が許可されています。バックグラウンドでの GPS 追跡が可能です。"
+        @unknown default:
+            return "不明な権限状態です。"
+        }
     }
     
     private var authorizationStatusText: String {

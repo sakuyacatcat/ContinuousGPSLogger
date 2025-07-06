@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreLocation
+import UIKit
 
 @MainActor
 final class LocationService: NSObject, ObservableObject {
@@ -16,6 +17,7 @@ final class LocationService: NSObject, ObservableObject {
     @Published private(set) var authorizationStatus: CLAuthorizationStatus = .notDetermined
     @Published private(set) var isTracking: Bool = false
     @Published private(set) var lastError: String?
+    @Published private(set) var permissionRequestInProgress: Bool = false
 
     private let manager = CLLocationManager()
 
@@ -26,7 +28,7 @@ final class LocationService: NSObject, ObservableObject {
         authorizationStatus = manager.authorizationStatus
         
         if authorizationStatus == .notDetermined {
-            manager.requestWhenInUseAuthorization()
+            manager.requestAlwaysAuthorization()
         } else if authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways {
             startTracking()
         }
@@ -49,9 +51,13 @@ extension LocationService: CLLocationManagerDelegate {
                                      didChangeAuthorization status: CLAuthorizationStatus) {
         Task { @MainActor in
             self.authorizationStatus = status
+            self.permissionRequestInProgress = false
             
             switch status {
-            case .authorizedWhenInUse, .authorizedAlways:
+            case .authorizedWhenInUse:
+                self.startTracking()
+                self.lastError = nil
+            case .authorizedAlways:
                 self.startTracking()
                 self.lastError = nil
             case .denied, .restricted:
@@ -86,5 +92,20 @@ extension LocationService: CLLocationManagerDelegate {
     private func stopTracking() {
         manager.stopUpdatingLocation()
         isTracking = false
+    }
+    
+    func requestAlwaysPermission() {
+        permissionRequestInProgress = true
+        manager.requestAlwaysAuthorization()
+    }
+    
+    func openSettings() {
+        if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(settingsUrl)
+        }
+    }
+    
+    var needsAlwaysPermission: Bool {
+        return authorizationStatus == .authorizedWhenInUse
     }
 }
