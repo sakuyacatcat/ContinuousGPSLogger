@@ -10,7 +10,7 @@ import CoreLocation
 
 struct MainView: View {
     @StateObject private var loc = LocationService.shared
-
+    
     var body: some View {
         Form {
             Section("権限状態") {
@@ -103,6 +103,84 @@ struct MainView: View {
                 }
             }
             
+            Section("GPS取得方式") {
+                VStack(alignment: .leading, spacing: 12) {
+                    // Strategy選択
+                    Picker("取得方式", selection: Binding(
+                        get: { loc.currentStrategyType },
+                        set: { loc.changeStrategy(to: $0) }
+                    )) {
+                        ForEach(loc.availableStrategies, id: \.self) { strategy in
+                            Text(strategy.displayName).tag(strategy)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    
+                    // 現在の Strategy の説明
+                    if let currentStrategy = getCurrentStrategyDescription() {
+                        Text(currentStrategy)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 4)
+                    }
+                    
+                    // Strategy統計
+                    if let stats = loc.getCurrentStrategyStatistics() {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("更新回数")
+                                Spacer()
+                                Text("\(stats.updateCount)回")
+                                    .foregroundColor(.blue)
+                            }
+                            
+                            if let lastUpdate = stats.lastUpdateTime {
+                                HStack {
+                                    Text("最終更新")
+                                    Spacer()
+                                    Text(lastUpdate, format: .dateTime.hour().minute().second())
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            
+                            HStack {
+                                Text("精度(平均)")
+                                Spacer()
+                                Text(stats.averageAccuracy > 0 ? "\(stats.averageAccuracy, specifier: "%.1f")m" : "-")
+                                    .foregroundColor(.secondary)
+                            }
+                            
+                            HStack {
+                                Text("電力消費")
+                                Spacer()
+                                Text(stats.estimatedBatteryUsage.rawValue)
+                                    .foregroundColor(batteryUsageColor(stats.estimatedBatteryUsage))
+                            }
+                            
+                            HStack {
+                                Text("更新頻度")
+                                Spacer()
+                                Text(stats.updateFrequency.rawValue)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .font(.caption)
+                        .padding(.horizontal, 4)
+                    }
+                    
+                    // 統計リセットボタン
+                    HStack {
+                        Button("統計リセット") {
+                            loc.resetCurrentStrategyStatistics()
+                        }
+                        .buttonStyle(.bordered)
+                        .font(.caption)
+                        
+                        Spacer()
+                    }
+                }
+            }
+            
             Section("保存統計") {
                 HStack {
                     Text("保存件数")
@@ -132,32 +210,51 @@ struct MainView: View {
             
             Section("バックグラウンド状態") {
                 HStack {
-                    Text("バックグラウンド位置更新")
+                    Text("バックグラウンド追跡")
                     Spacer()
-                    Text(loc.isBackgroundLocationEnabled ? "有効" : "無効")
-                        .foregroundColor(loc.isBackgroundLocationEnabled ? .green : .gray)
+                    Text(backgroundTrackingStatusText)
+                        .foregroundColor(backgroundTrackingStatusColor)
                 }
                 
-                HStack {
-                    Text("重要な位置変更の監視")
-                    Spacer()
-                    Text(loc.isSignificantLocationChangesEnabled ? "監視中" : "停止中")
-                        .foregroundColor(loc.isSignificantLocationChangesEnabled ? .green : .gray)
-                }
-                
-                if let lastUpdate = loc.lastBackgroundUpdate {
-                    HStack {
-                        Text("最後のバックグラウンド更新")
-                        Spacer()
-                        Text(lastUpdate, format: .dateTime.hour().minute().second())
-                            .foregroundColor(.secondary)
-                    }
-                }
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(backgroundStatusText)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("動作について")
                         .font(.caption)
+                        .fontWeight(.medium)
+                        .foregroundStyle(.orange)
+                    
+                    Text("• 取得方式により動作が異なります")
+                        .font(.caption2)
                         .foregroundStyle(.secondary)
+                    
+                    Text("• Standard: フォアグラウンド1Hz、バックグラウンド5m間隔")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    
+                    Text("• Significant: アプリキル後も継続、500m〜数km間隔")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    
+                    Text("• Region: 100m地域の出入りで更新、電源OFF後も可能")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    
+                    Text("• データ保存: 最大100件まで")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                
+                // システム制御
+                if loc.authorizationStatus == .authorizedAlways && loc.recoveryAttempts > 0 {
+                    HStack {
+                        Button("状態リセット") {
+                            loc.clearErrors()
+                            loc.clearRecoveryLog()
+                        }
+                        .buttonStyle(.bordered)
+                        .font(.caption)
+                        
+                        Spacer()
+                    }
                 }
             }
             
@@ -218,15 +315,49 @@ struct MainView: View {
         }
     }
     
-    private var backgroundStatusText: String {
+    private var backgroundTrackingStatusText: String {
         if loc.authorizationStatus == .authorizedAlways {
-            if loc.isBackgroundLocationEnabled && loc.isSignificantLocationChangesEnabled {
-                return "バックグラウンドでの位置追跡が有効です。アプリ終了後も継続的に位置情報を記録します。"
+            if loc.isBackgroundLocationEnabled && (loc.isSignificantLocationChangesEnabled || loc.isRegionMonitoringEnabled) {
+                return "有効"
             } else {
-                return "Always権限が許可されていますが、バックグラウンド機能の設定が不完全です。"
+                return "設定中"
             }
         } else {
-            return "バックグラウンドでの位置追跡にはAlways権限が必要です。"
+            return "無効"
+        }
+    }
+    
+    private var backgroundTrackingStatusColor: Color {
+        if loc.authorizationStatus == .authorizedAlways {
+            if loc.isBackgroundLocationEnabled && (loc.isSignificantLocationChangesEnabled || loc.isRegionMonitoringEnabled) {
+                return .green
+            } else {
+                return .orange
+            }
+        } else {
+            return .red
+        }
+    }
+    
+    private func getCurrentStrategyDescription() -> String? {
+        switch loc.currentStrategyType {
+        case .significantLocationChanges:
+            return "大幅な位置変更時のみ更新。省電力だが低頻度（通常500m〜数km移動で更新）。アプリキル後・電源OFF後も継続。"
+        case .standardLocationUpdates:
+            return "5m移動ごとに更新。高精度だが電力消費大。バックグラウンド5m間隔、アプリキル後は停止。"
+        case .regionMonitoring:
+            return "100m地域の出入りで更新。中程度の精度と電力消費。アプリキル後・電源OFF後も継続可能。"
+        }
+    }
+    
+    private func batteryUsageColor(_ usage: StrategyStatistics.BatteryUsageLevel) -> Color {
+        switch usage {
+        case .low:
+            return .green
+        case .medium:
+            return .orange
+        case .high, .veryHigh:
+            return .red
         }
     }
 }

@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-		<string>logger.flush</string>
-	</array>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>location</string>
-		<string>fetch</string>
-		<string>processing</string>
-	</array>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>現在地を記録してランニングログを作成するため</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>ランニング中にスマートフォンを紛失しても後で捜索することができうようにするため</string>
-</dict>
+	<dict>
+		<key>BGTaskSchedulerPermittedIdentifiers</key>
+		<array>
+			<string>logger.flush</string>
+		</array>
+		<key>UIBackgroundModes</key>
+		<array>
+			<string>location</string>
+			<string>fetch</string>
+			<string>processing</string>
+		</array>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>現在地を記録してランニングログを作成するため</string>
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>ランニング中にアプリを起動せずとも後で走行の軌跡を確認できるようにするため</string>
+	</dict>
 </plist>

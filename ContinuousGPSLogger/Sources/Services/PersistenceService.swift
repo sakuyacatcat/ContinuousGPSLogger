@@ -124,4 +124,28 @@ import CoreLocation
              return nil
          }
      }
+     
+     /// 件数制限による古いデータ削除（FIFO方式）
+     func limitData(maxCount: Int = 100) {
+         let context = container.viewContext
+         let currentCount = getTotalCount()
+         
+         guard currentCount > maxCount else { return }
+         
+         let deleteCount = currentCount - maxCount
+         let request = TrackPoint.fetchRequest()
+         request.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)] // 古い順
+         request.fetchLimit = deleteCount
+         
+         do {
+             let oldestPoints = try context.fetch(request)
+             for point in oldestPoints {
+                 context.delete(point)
+             }
+             try context.save()
+             print("データ制限: \(deleteCount)件の古いデータを削除しました")
+         } catch {
+             print("データ制限エラー:", error)
+         }
+     }
  }
