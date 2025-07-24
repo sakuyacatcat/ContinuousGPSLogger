@@ -13,86 +13,83 @@ struct MainView: View {
     
     var body: some View {
         Form {
-            Section("権限状態") {
-                HStack {
-                    Text("位置情報権限")
-                    Spacer()
-                    Text(authorizationStatusText)
-                        .foregroundColor(authorizationStatusColor)
-                }
+            Section(LocalizedStrings.Sections.permissionStatus) {
+                StatusIndicatorView(
+                    label: "位置情報権限",
+                    status: authorizationStatusText,
+                    statusColor: authorizationStatusColor
+                )
                 
-                HStack {
-                    Text("位置取得状態")
-                    Spacer()
-                    Text(loc.isTracking ? "取得中" : "停止中")
-                        .foregroundColor(loc.isTracking ? .green : .gray)
-                }
+                StatusIndicatorView(
+                    label: "位置取得状態",
+                    status: loc.isTracking ? "取得中" : "停止中",
+                    statusColor: loc.isTracking ? .green : .gray
+                )
                 
                 if loc.permissionRequestInProgress {
-                    HStack {
-                        ProgressView()
-                            .scaleEffect(0.8)
-                        Text("権限を要求中…")
-                            .foregroundStyle(.secondary)
-                    }
+                    StatusIndicatorView(
+                        label: "",
+                        status: "権限を要求中…",
+                        statusColor: .secondary,
+                        showProgressIndicator: true
+                    )
                 }
                 
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: AppConstants.UI.sectionSpacing) {
                     Text(permissionGuidanceText)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     
                     if loc.needsAlwaysPermission {
-                        Button("Always 権限をリクエスト") {
+                        ActionButtonView(
+                            title: "Always 権限をリクエスト",
+                            style: .prominent,
+                            isDisabled: loc.permissionRequestInProgress
+                        ) {
                             loc.requestAlwaysPermission()
                         }
-                        .buttonStyle(.borderedProminent)
-                        .disabled(loc.permissionRequestInProgress)
                     } else if loc.authorizationStatus == .denied {
-                        Button("設定を開く") {
+                        ActionButtonView(
+                            title: "設定を開く",
+                            style: .bordered
+                        ) {
                             loc.openSettings()
                         }
-                        .buttonStyle(.bordered)
                     }
                 }
             }
             
-            Section("現在地") {
+            Section(LocalizedStrings.Sections.currentLocation) {
                 if let c = loc.current {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("緯度")
-                            Spacer()
-                            Text("\(c.coordinate.latitude, specifier: "%.6f")")
-                        }
+                    VStack(alignment: .leading, spacing: AppConstants.UI.sectionSpacing) {
+                        InfoRowView(
+                            label: "緯度",
+                            value: String(format: "%.6f", c.coordinate.latitude)
+                        )
                         
-                        HStack {
-                            Text("経度")
-                            Spacer()
-                            Text("\(c.coordinate.longitude, specifier: "%.6f")")
-                        }
+                        InfoRowView(
+                            label: "経度",
+                            value: String(format: "%.6f", c.coordinate.longitude)
+                        )
                         
                         if c.horizontalAccuracy > 0 {
-                            HStack {
-                                Text("精度")
-                                Spacer()
-                                Text("\(c.horizontalAccuracy, specifier: "%.1f")m")
-                            }
+                            InfoRowView(
+                                label: "精度",
+                                value: String(format: "%.1f", c.horizontalAccuracy) + "m"
+                            )
                         }
                         
                         if c.speed >= 0 {
-                            HStack {
-                                Text("速度")
-                                Spacer()
-                                Text("\(c.speed * 3.6, specifier: "%.1f")km/h")
-                            }
+                            InfoRowView(
+                                label: "速度",
+                                value: String(format: "%.1f", c.speed * 3.6) + "km/h"
+                            )
                         }
                         
-                        HStack {
-                            Text("更新時刻")
-                            Spacer()
-                            Text(c.timestamp, format: .dateTime.hour().minute().second())
-                        }
+                        InfoRowView(
+                            label: "更新時刻",
+                            value: c.timestamp.formatted(.dateTime.hour().minute().second())
+                        )
                     }
                 } else {
                     HStack {
@@ -104,7 +101,7 @@ struct MainView: View {
             }
             
             Section("GPS取得方式") {
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: AppConstants.UI.sectionSpacing + 4) {
                     // Strategy選択
                     Picker("取得方式", selection: Binding(
                         get: { loc.currentStrategyType },
@@ -170,11 +167,12 @@ struct MainView: View {
                     
                     // 統計リセットボタン
                     HStack {
-                        Button("統計リセット") {
+                        ActionButtonView(
+                            title: "統計リセット",
+                            style: .caption
+                        ) {
                             loc.resetCurrentStrategyStatistics()
                         }
-                        .buttonStyle(.bordered)
-                        .font(.caption)
                         
                         Spacer()
                     }
@@ -182,20 +180,18 @@ struct MainView: View {
             }
             
             Section("保存統計") {
-                HStack {
-                    Text("保存件数")
-                    Spacer()
-                    Text("\(loc.saveCount)件")
-                        .foregroundColor(.green)
-                }
+                InfoRowView(
+                    label: "保存件数",
+                    value: "\(loc.saveCount)件",
+                    valueColor: .green
+                )
                 
                 if let lastSave = loc.lastSaveTimestamp {
-                    HStack {
-                        Text("最終保存")
-                        Spacer()
-                        Text(lastSave, format: .dateTime.hour().minute().second())
-                            .foregroundColor(.secondary)
-                    }
+                    InfoRowView(
+                        label: "最終保存",
+                        value: lastSave.formatted(.dateTime.hour().minute().second()),
+                        valueColor: .secondary
+                    )
                 }
                 
                 if let error = loc.saveError {
@@ -209,12 +205,11 @@ struct MainView: View {
             }
             
             Section("バックグラウンド状態") {
-                HStack {
-                    Text("バックグラウンド追跡")
-                    Spacer()
-                    Text(backgroundTrackingStatusText)
-                        .foregroundColor(backgroundTrackingStatusColor)
-                }
+                StatusIndicatorView(
+                    label: "バックグラウンド追跡",
+                    status: backgroundTrackingStatusText,
+                    statusColor: backgroundTrackingStatusColor
+                )
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("動作について")
@@ -246,12 +241,13 @@ struct MainView: View {
                 // システム制御
                 if loc.authorizationStatus == .authorizedAlways && loc.recoveryAttempts > 0 {
                     HStack {
-                        Button("状態リセット") {
+                        ActionButtonView(
+                            title: "状態リセット",
+                            style: .caption
+                        ) {
                             loc.clearErrors()
                             loc.clearRecoveryLog()
                         }
-                        .buttonStyle(.bordered)
-                        .font(.caption)
                         
                         Spacer()
                     }
@@ -265,7 +261,7 @@ struct MainView: View {
                 }
             }
         }
-        .navigationTitle("現在地")
+        .navigationTitle(LocalizedStrings.Navigation.currentLocation)
     }
     
     private var permissionGuidanceText: String {
