@@ -106,6 +106,7 @@ enum LocationAcquisitionStrategyType: String, CaseIterable {
     case significantLocationChanges = "significant"
     case standardLocationUpdates = "standard"
     case regionMonitoring = "region"
+    case regionTriggeredStandard = "regionTriggeredStandard"
     
     var displayName: String {
         switch self {
@@ -115,6 +116,8 @@ enum LocationAcquisitionStrategyType: String, CaseIterable {
             return "Standard Location Updates"
         case .regionMonitoring:
             return "Region Monitoring"
+        case .regionTriggeredStandard:
+            return "Region Triggered Standard"
         }
     }
     
@@ -126,6 +129,8 @@ enum LocationAcquisitionStrategyType: String, CaseIterable {
             return "SLU"
         case .regionMonitoring:
             return "RM"
+        case .regionTriggeredStandard:
+            return "RTS"
         }
     }
 }
@@ -141,6 +146,8 @@ class LocationAcquisitionStrategyFactory {
             return StandardLocationUpdatesStrategy()
         case .regionMonitoring:
             return RegionMonitoringStrategy()
+        case .regionTriggeredStandard:
+            return RegionTriggeredStandardStrategy()
         }
     }
 }

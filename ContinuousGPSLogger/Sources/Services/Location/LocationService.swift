@@ -189,6 +189,11 @@ extension LocationService: CLLocationManagerDelegate {
                 regionStrategy.didEnterRegion(region)
             }
             
+            // RegionTriggeredStandardStrategyに通知
+            if let regionTriggeredStrategy = self.currentStrategy as? RegionTriggeredStandardStrategy {
+                regionTriggeredStrategy.didEnterRegion(region)
+            }
+            
             let event = "地域進入: \(region.identifier)"
             self.addRegionEvent(event)
             self.addRecoveryLog(event)
@@ -200,6 +205,11 @@ extension LocationService: CLLocationManagerDelegate {
             // RegionMonitoringStrategyに通知
             if let regionStrategy = self.currentStrategy as? RegionMonitoringStrategy {
                 regionStrategy.didExitRegion(region, with: manager)
+            }
+            
+            // RegionTriggeredStandardStrategyに通知
+            if let regionTriggeredStrategy = self.currentStrategy as? RegionTriggeredStandardStrategy {
+                regionTriggeredStrategy.didExitRegion(region, with: manager)
             }
             
             let event = "地域退出: \(region.identifier) - 新しい地域の監視を開始"
@@ -220,6 +230,11 @@ extension LocationService: CLLocationManagerDelegate {
                 regionStrategy.monitoringDidFailFor(region, withError: error)
             }
             
+            // RegionTriggeredStandardStrategyに通知
+            if let regionTriggeredStrategy = self.currentStrategy as? RegionTriggeredStandardStrategy {
+                regionTriggeredStrategy.monitoringDidFailFor(region, withError: error)
+            }
+            
             let event = "地域監視エラー: \(error.localizedDescription)"
             self.addRegionEvent(event)
             self.addRecoveryLog(event)
@@ -232,6 +247,11 @@ extension LocationService: CLLocationManagerDelegate {
             // RegionMonitoringStrategyに通知
             if let regionStrategy = self.currentStrategy as? RegionMonitoringStrategy {
                 regionStrategy.didStartMonitoringFor(region)
+            }
+            
+            // RegionTriggeredStandardStrategyに通知
+            if let regionTriggeredStrategy = self.currentStrategy as? RegionTriggeredStandardStrategy {
+                regionTriggeredStrategy.didStartMonitoringFor(region)
             }
             
             let event = "地域監視開始: \(region.identifier)"
