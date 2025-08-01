@@ -343,6 +343,8 @@ struct MainView: View {
             return "5m移動ごとに更新。高精度だが電力消費大。バックグラウンド5m間隔、アプリキル後は停止。"
         case .regionMonitoring:
             return "100m地域の出入りで更新。中程度の精度と電力消費。アプリキル後・電源OFF後も継続可能。"
+        case .regionTriggeredStandard:
+            return "地域の出入りでStandard Location Updatesを開始。アプリキル後も1Hz GPS取得可能。"
         }
     }
     
