@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/zsh
 
 # Exit on error (-e), undefined vars (-u), and pipeline failures (-o pipefail)
 set -euxo pipefail
